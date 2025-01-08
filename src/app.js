@@ -35,6 +35,29 @@ app.get("/admin/deleteAlldata",(req,res)=>{
     }
 })
     */
+app.use("/", (err, req, res, next) => {
+    if (err) {
+      // Log your error
+      res.status(500).send("something went wrong");
+    }
+  });
+  
+  app.get("/getUserData", (req, res) => {
+    //try {
+    // Logic of DB call and get user data
+  
+    throw new Error("dvbzhjf");
+    res.send("User Data Sent");
+    //   } catch (err) {
+    //     res.status(500).send("Some Error contact support team");
+    //   }
+  });
+  app.use("/", (err, req, res, next) => {
+    if (err) {
+      // Log your error
+      res.status(500).send("something went wrong");
+    }
+  });
 app.use("/admin",adminAuth);
 app.post("/user/login",(req,res)=>{
     res.send("Logged in seccessfully");
