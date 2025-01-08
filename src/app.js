@@ -1,34 +1,85 @@
 const express= require('express');
+const {adminAuth, userAuth} = require("./middlewares/auth");
 
 const app= express();
 
-app.get(
-    "/user",
-    (req, res, next) => {
-      console.log("Handling the route user!!");
-      next();
-    },
-    (req, res, next) => {
-      console.log("Handling the route user 2!!");
-      // res.send("2nd Response!!");
-      next();
-    },
-  
-    (req, res, next) => {
-      console.log("Handling the route user 3!!");
-      // res.send("3rd Response!!");
-      next();
-    },
-    (req, res, next) => {
-      console.log("Handling the route user 4!!");
-      // res.send("4th Response!!");
-      next();
-    },
-    (req, res, next) => {
-      console.log("Handling the route user 5!!");
-      res.send("5th Response!!");
+
+/*why do we have to authenticate for each request handler?? this is ware middlware comes into action
+app.get("/admin/getAlldata",(req,res)=>{
+    const token ="xyz";
+    const isAuthenticated = token === "xyz";
+    if(isAuthenticated){
+        res.send("Got all the data");
     }
-  );
+});
+app.get("/admin/deleteAlldata",(req,res)=>{
+    const token ="xyz";
+    const isAuthenticated = token === "xyz";
+    if(isAuthenticated){
+        res.send("Deleted all the data");
+    }  
+});
+*/
+
+
+/* we will create a new folder for middlewares
+    app.use("/admin",(req,res,next)=>{
+    console.log("Handling the /admin middleware");
+    const token ="xyz";
+    const isAuthenticated = token === "xyz";
+    if(!isAuthenticated){
+        res.status(401).send("Unauthorized Access");
+    }
+    else{
+        next();
+    }
+})
+    */
+app.use("/admin",adminAuth);
+app.post("/user/login",(req,res)=>{
+    res.send("Logged in seccessfully");
+})
+app.get("/user/data",userAuth,(req,res)=>{
+
+});
+app.get("/admin/getAlldata",(req,res)=>{
+        res.send("Got all the data");
+});
+app.get("/admin/deleteAlldata",(req,res)=>{
+        res.send("Deleted all the data");  
+});
+
+
+// app.get(
+//     "/user",
+//     (req, res, next) => {
+//       console.log("Handling the route user!!");
+//       next();
+//     },
+//     (req, res, next) => {
+//       console.log("Handling the route user 2!!");
+//       // res.send("2nd Response!!");
+//       next();
+//     },
+  
+//     (req, res, next) => {
+//       console.log("Handling the route user 3!!");
+//       // res.send("3rd Response!!");
+//       next();
+//     },
+//     (req, res, next) => {
+//       console.log("Handling the route user 4!!");
+//       // res.send("4th Response!!");
+//       next();
+//     },
+//     (req, res, next) => {
+//       console.log("Handling the route user 5!!");
+//       res.send("5th Response!!");
+//     }
+//   );
+
+
+
 //what if we add another route /user with app.use what will happen to the get,post,delete calls?
 // app.use("/user",(req,res) => {
 //     res.send("order matters guys!! thats why all http method will show this call if we use this in the end then get,post, delete wil work just fine");
