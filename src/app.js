@@ -36,10 +36,26 @@ app.get("/user",async (req,res) =>{
         res.send(users);
            
         }
-        catch{
+        catch(err){
             res.status(400).send("somthing went wrong");
         }
 });
+app.delete("/user",async (req,res) =>{
+    const userId = req.body.userId;  
+  
+    try{
+        const user = await User.findByIdAndDelete(userId);
+        //const user = await User.findByIdAndDelete({_id: userId}); same thing
+        res.send("user deleted successfully");
+    }
+    catch(err){
+        res.status(400).send("somthing went wrong");
+    }
+});
+
+
+
+
 app.get("/feed",async (req,res) =>{
     const user = await User.find({});  //Empty filtering will give you all the users data
     try{
