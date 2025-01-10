@@ -6,7 +6,6 @@ const User = require("./models/user");
 const app= express();
 app.use(express.json());
 app.post("/signup",async (req,res) =>{
-    console.log(req.body);
     //creating a new instance of the user model
     const user = new User(req.body);
   try { 
@@ -18,6 +17,7 @@ app.post("/signup",async (req,res) =>{
 });
 
 app.get("/user",async (req,res) =>{
+    //GET user by email
     // const users = await User.find({emailId : req.body.emailId});
     // try{
     //     if(users.length === 0){
@@ -27,9 +27,10 @@ app.get("/user",async (req,res) =>{
     //     }
        
     // }
-    // catch{
+    // catch(err){
     //     res.status(400).send("somthing went wrong");
     // }
+    //Get user by ID
     const userId = req.body.userId;  //best practice    
     const users = await User.findById({_id: userId});
     try{
@@ -40,6 +41,9 @@ app.get("/user",async (req,res) =>{
             res.status(400).send("somthing went wrong");
         }
 });
+
+
+//DELETE the user from the database
 app.delete("/user",async (req,res) =>{
     const userId = req.body.userId;  
   
@@ -53,15 +57,27 @@ app.delete("/user",async (req,res) =>{
     }
 });
 
+//UPDATE the user in the database
+app.patch("/user",async (req,res) =>{
+    const userId = req.body.userId;
+    const data = req.body;
+    try{
+        const user = await User.findByIdAndUpdate(userId,data);
+        res.send("user updated successfully");
+    }
+    catch(err){
+        res.status(400).send("somthing went wrong");
+    }
+});
 
 
-
+//Fees API - Get /feed - get all the users from the database
 app.get("/feed",async (req,res) =>{
     const user = await User.find({});  //Empty filtering will give you all the users data
     try{
         res.status(200).send(user);
     }
-    catch{
+    catch(err){
         res.status(400).send("something went wrong");
     }
 })
