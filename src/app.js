@@ -17,6 +17,41 @@ app.post("/signup",async (req,res) =>{
 }
 });
 
+app.get("/user",async (req,res) =>{
+    // const users = await User.find({emailId : req.body.emailId});
+    // try{
+    //     if(users.length === 0){
+    //         res.status(404).send("User not found");
+    //     }else{
+    //         res.send(users);
+    //     }
+       
+    // }
+    // catch{
+    //     res.status(400).send("somthing went wrong");
+    // }
+    const userId = req.body.userId;  //best practice    
+    const users = await User.findById({_id: userId});
+    try{
+        res.send(users);
+           
+        }
+        catch{
+            res.status(400).send("somthing went wrong");
+        }
+});
+app.get("/feed",async (req,res) =>{
+    const user = await User.find({});  //Empty filtering will give you all the users data
+    try{
+        res.status(200).send(user);
+    }
+    catch{
+        res.status(400).send("something went wrong");
+    }
+})
+
+
+
 connectDB()
     .then(() => {
         console.log("MongoDB Connected...");
