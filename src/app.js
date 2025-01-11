@@ -12,7 +12,7 @@ app.post("/signup",async (req,res) =>{
      await user.save();
     res.send("User added successfully");
 } catch(err){
-    res.status(400).res("error saving the user" + err.message);
+    res.status(400).send("error saving the user" + err.message);
 }
 });
 
@@ -53,8 +53,9 @@ app.delete("/user",async (req,res) =>{
         res.send("user deleted successfully");
     }
     catch(err){
-        res.status(400).send("somthing went wrong");
+        res.status(400).send("Error saving the user: " + err.message);
     }
+    
 });
 
 //UPDATE the user in the database
