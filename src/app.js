@@ -1,15 +1,31 @@
 const express= require('express');
 const connectDB = require("./config/database");
 const User = require("./models/user");
-const {validateSignData} = require("./utils/validation");
+const {validateSignData,validateLoginData} = require("./utils/validation");
+const bcrycpt = require("bcrypt");
+
+
 
 const app= express();
 app.use(express.json());
 app.post("/signup",async (req,res) =>{
-    //creating a new instance of the user model
-    const user = new User(req.body);
+   
   try { 
+    //Validation of data
     validateSignData(req);
+
+    const {firstName, lastName, emailId,password} = req.body;
+    //Encrypt the password
+    const passwordHash =await bcrycpt.hash(password,10);
+
+     //creating a new instance of the user model
+     const user = new User({
+        firstName,
+        lastName,
+        emailId,
+        password: passwordHash,
+     });
+  
      await user.save();
     res.send("User added successfully");
 } catch(err){
@@ -17,6 +33,28 @@ app.post("/signup",async (req,res) =>{
 }
 });
 
+
+app.post("/login",async (req, res) =>{
+    try{
+    //    validateLoginData(req); No need to validate here since we are not inserting data we are logging with exixsting data.
+        const {emailId,password} = req.body;
+        const user = await User.findOne({emailId: emailId});
+        if(!user){
+            throw new Error("Iinvalid credentials");
+        }
+        const isPasswordValid = await bcrycpt.compare(password,user.password);
+            if(isPasswordValid){
+                res.send("Login successfully");
+            }
+            else{
+               throw new Error("Invalid credentials")
+            }
+        
+    }
+    catch(err){
+        res.status(400).send("ERROR " + err.message);
+    }
+})
 app.get("/user",async (req,res) =>{
     //GET user by email
     // const users = await User.find({emailId : req.body.emailId});
@@ -85,7 +123,7 @@ app.patch("/user/:userId",async (req,res) =>{
 });
 
 
-//Fees API - Get /feed - get all the users from the database
+//Feed API - Get /feed - get all the users from the database
 app.get("/feed",async (req,res) =>{
     const user = await User.find({});  //Empty filtering will give you all the users data
     try{
