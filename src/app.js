@@ -59,8 +59,7 @@ app.post("/login",async (req, res) =>{
         const isPasswordValid = await bcrycpt.compare(password,user.password);
             if(isPasswordValid){
                 //create a jwt token
-                const token = await jwt.sign({_id:user._id},"DEV@Tinder1802",{expiresIn:"7d"});
-                //console.log(token);
+                const token = await user.getJWT();
                 //add token to cookie and send the response back to the server
                 res.cookie("token",token,{
                     expires: new Date(Date.now()+ 8*360000),          //8 days before expiration
