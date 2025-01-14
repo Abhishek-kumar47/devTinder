@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const connectionRequestSchema = new mongoose.Schema({
-    fromuserId:{
+    fromUserId:{
         type: mongoose.Schema.Types.ObjectId,
         required: true,
     },
@@ -11,12 +11,28 @@ const connectionRequestSchema = new mongoose.Schema({
     },
     status:{
         type: String,
+        required: true,
         enums:{
-            value:["interested","ignored","accepted","rejected"],
-            message:`{VALUE} is incorrect status type`       
+            values:["interested","ignored","accepted","rejected"],
+            message:`{VALUE} is incorrect status type`,       
          },
     },
 },
 {timestamps: true}
 );
+//Compound Index
+// ConnectionRequest.find({fromUserId: 273478465864786587, toUserId: 273478465864786587})
+connectionRequestSchema.index({fromUserId:1, toUserId:1});
+
+connectionRequestSchema.pre('save', function(next){
+    const connectionRequest = this;
+    //check if the fromUserId is same as toUserId
+    if((connectionRequest.fromUserId.equals(connectionRequest.toUserId))){
+        throw new Error("Cannot send connection request to yourself");
+    }
+    next();
+});
+
 const ConnectionRequestModel = new mongoose.model("ConnectionRequest",connectionRequestSchema);
+
+module.exports = ConnectionRequestModel;
