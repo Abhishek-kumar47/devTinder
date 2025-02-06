@@ -68,20 +68,26 @@ userRouter.get("/user/feed", userAuth,async (req,res)=>{
         }).select("fromUserId toUserId");
 
         const hideUsersFromFeed = new Set();
-        connectionRequests.forEach(req => {
+        connectionRequests.forEach((req) => {
             hideUsersFromFeed.add(req.fromUserId.toString());
             hideUsersFromFeed.add(req.toUserId.toString());
         });
+        
+        hideUsersFromFeed.delete(loggedInUser._id.toString()); // Ensure self is not excluded
+        
         const users = await User.find({
-            $and :[
-                {_id:{$nin : Array.from(hideUsersFromFeed)}},
-                {_id:{$ne : loggedInUser._id}}
-            ],
+            _id: { $nin: Array.from(hideUsersFromFeed) } // No need for additional $ne filter
         })
         .select(USER_SAFE_DATA)
         .skip(skip)
         .limit(limit);
-        res.send(users);
+        
+        res.json({ data: users });
+       // console.log("Hide Users:", Array.from(hideUsersFromFeed));      //debugging
+       // console.log("Logged In User:", loggedInUser._id);
+       // console.log("Users to Show:", users);
+
+
     }catch(err){
         res.status(400).json({error: err.message});
     }

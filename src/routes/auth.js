@@ -22,8 +22,13 @@ authRouter.post("/signup",async (req,res) =>{
           password: passwordHash,
        });
     
-       await user.save();
-      res.send("User added successfully");
+        const savedUser = await user.save();
+        const token = await savedUser.getJWT();
+        //add token to cookie and send the response back to the server
+        res.cookie("token",token,{
+            expires: new Date(Date.now()+ 8*360000),          //8 days before expiration
+        });
+      res.json({message: "User added successfully", data: savedUser});
   } catch(err){
       res.status(400).send("ERROR : " + err.message);
   }
@@ -34,7 +39,7 @@ authRouter.post("/signup",async (req,res) =>{
         const {emailId,password} = req.body;
         const user = await User.findOne({emailId: emailId});
         if(!user){
-            throw new Error("Iinvalid credentials");
+            throw new Error("Invalid credentials");
         }
         const isPasswordValid = await bcrycpt.compare(password,user.password);
             if(isPasswordValid){
@@ -44,7 +49,7 @@ authRouter.post("/signup",async (req,res) =>{
                 res.cookie("token",token,{
                     expires: new Date(Date.now()+ 8*360000),          //8 days before expiration
                 });
-                res.send("Login successfully");
+                res.send(user);
             }
             else{
                throw new Error("Invalid credentials")
@@ -52,7 +57,7 @@ authRouter.post("/signup",async (req,res) =>{
         
     }
     catch(err){
-        res.status(400).send("ERROR " + err.message);
+        res.status(400).send("ERROR: " + err.message);
     }
 });
  authRouter.post("/logout", async (req, res) => {
